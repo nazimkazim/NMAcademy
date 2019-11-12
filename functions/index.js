@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
 const app = express();
+const firebase = require("firebase");
 
 //require("firebase/auth");
 //require("firebase/database");
@@ -14,6 +15,19 @@ const app = express();
 //
 
 var serviceAccount = require("./credKey.json");
+
+var firebaseConfig = {
+  apiKey: "AIzaSyBMz-NYCPoc_vD2n4vUDl7_zlvDXam6slE",
+  authDomain: "social-apes-7db9c.firebaseapp.com",
+  databaseURL: "https://social-apes-7db9c.firebaseio.com",
+  projectId: "social-apes-7db9c",
+  storageBucket: "social-apes-7db9c.appspot.com",
+  messagingSenderId: "887458792299",
+  appId: "1:887458792299:web:1c594f3cb981e5d74e022e",
+  measurementId: "G-RNB7M63CT9"
+};
+
+firebase.initializeApp(firebaseConfig);
 
 // Initialize the app with a service account, granting admin privileges
 admin.initializeApp({
