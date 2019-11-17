@@ -14,7 +14,7 @@ const firebase = require("firebase");
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 
-var serviceAccount = require("./credKey.json");
+//var serviceAccount = require("./credKey.json");
 
 var firebaseConfig = {
   apiKey: "AIzaSyBMz-NYCPoc_vD2n4vUDl7_zlvDXam6slE",
@@ -30,10 +30,10 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 // Initialize the app with a service account, granting admin privileges
-admin.initializeApp({
+/*admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://<database name>.firebaseio.com"
-});
+});*/
 
 app.get("/screams", (req, res) => {
   admin
