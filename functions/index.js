@@ -1,20 +1,18 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const express = require("express");
-const app = express();
+const app = require("express")();
 const firebase = require("firebase");
-
-//require("firebase/auth");
-//require("firebase/database");
-//require("firebase/firestore");
-//require("firebase/messaging");
-//require("firebase/functions");
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 
-//var serviceAccount = require("./credKey.json");
+var serviceAccount = require("./credKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://<DATABASE_NAME>.firebaseio.com"
+});
 
 var firebaseConfig = {
   apiKey: "AIzaSyBMz-NYCPoc_vD2n4vUDl7_zlvDXam6slE",
@@ -29,16 +27,10 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-// Initialize the app with a service account, granting admin privileges
-/*admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://<database name>.firebaseio.com"
-});*/
+const db = admin.firestore();
 
 app.get("/screams", (req, res) => {
-  admin
-    .firestore()
-    .collection("screams")
+  db.collection("screams")
     .orderBy("createdAt", "desc")
     .get()
     .then(data => {
@@ -63,9 +55,7 @@ app.post("/scream", (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  admin
-    .firestore()
-    .collection("screams")
+  db.collection("screams")
     .add(newScream)
     .then(doc => {
       res.json({ message: `document ${doc.id} created successfully` });
@@ -73,6 +63,43 @@ app.post("/scream", (req, res) => {
     .catch(err => {
       res.status(500).json({ error: "something went wrong" });
       console.log(err);
+    });
+});
+
+app.post("/signup", (req, res) => {
+  const newUser = {
+    email: req.body.email,
+    password: req.body.password,
+    confirmPassword: req.body.confirmPassword,
+    handle: req.body.handle
+  };
+
+  let userId, token;
+
+  db.doc(`/users/${newUser.handle}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        return res.status(400).json({ handle: "this handle is already taken" });
+      } else {
+        return firebase
+          .auth()
+          .createUserWithEmailAndPassword(newUser.email, newUser.password);
+      }
+    })
+    .then(data => {
+      userId = data.user.uid;
+      return data.user.getIdToken();
+    })
+    .then(idToken => {
+      token = idToken
+  
+      return res.status(200).json({ token });
+      
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
     });
 });
 
